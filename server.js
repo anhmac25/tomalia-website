@@ -51,13 +51,25 @@ app.use("/public", express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // sessions
+// sessions
+const sessionsDir =
+  (process.env.SESSIONS_DB_DIR && fs.existsSync(process.env.SESSIONS_DB_DIR))
+    ? process.env.SESSIONS_DB_DIR
+    : __dirname; // fallback locally
+
+// On Render, if disk isn't mounted, /var/data won't exist. Use /tmp as a guaranteed writable fallback.
+const safeSessionsDir =
+  sessionsDir === "/var/data" && !fs.existsSync("/var/data")
+    ? "/tmp"
+    : sessionsDir;
+
 app.use(
   session({
     store: new SQLiteStore({
       db: process.env.SESSIONS_DB_FILE || "sessions.sqlite",
-      dir: process.env.SESSIONS_DB_DIR || __dirname
+      dir: safeSessionsDir,
     }),
-    secret: "tomalia-dev-secret-change-me",
+    secret: process.env.SESSION_SECRET || "tomalia-dev-secret-change-me",
     resave: false,
     saveUninitialized: false,
     cookie: { httpOnly: true },
