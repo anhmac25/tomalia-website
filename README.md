@@ -1,4 +1,4 @@
-# Tomalia (Mercari-like prototype for Vietnam)
+# tomalia (Mercari-like prototype for Vietnam)
 
 This is a **class-project prototype** of a fandom-focused C2C marketplace inspired by Mercari,
 with additional "trust" features (Escrow concept, verification, seller tags, transaction screen).
@@ -18,7 +18,7 @@ npm install
 npm run dev
 ```
 3) Open:
-- http://localhost:3000
+- http://localhost:10000
 
 ## Demo accounts (auto-seeded)
 - demo_buyer / Password123!
@@ -35,5 +35,5 @@ npm run dev
 - `/orders/:orderId/transaction` Seller transaction screen (fee 6% after sold)
 
 ## Notes
-- This prototype does not implement real payments; QR is a placeholder payload.
+- This prototype does not implement real payments.
 - Security hardening (CSRF, rate limiting, production session secret, etc.) is not included.
