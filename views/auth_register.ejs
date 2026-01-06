@@ -1,0 +1,38 @@
+<div class="section">
+  <div class="h1">Register</div>
+  <div class="muted">Travelers must provide the information to join <span style="color:#c41e07;">tomalia</span>!</div>
+  <% if (error) { %><div class="toast"><%= error %></div><% } %>
+</div>
+
+<div class="panel">
+  <form class="form" method="POST" action="/register">
+    <div class="two">
+      <div>
+        <label>Full name</label>
+        <input name="name" placeholder="eg. Tomalian" required />
+      </div>
+      <div>
+        <label>Username</label>
+        <input name="username" placeholder="eg. tomalian" required />
+      </div>
+    </div>
+
+    <div class="two">
+      <div>
+        <label>Phone (+84)</label>
+        <input name="phone" placeholder="Phone must start with +84" required />
+      </div>
+      <div>
+        <label>Email</label>
+        <input name="email" type="email" placeholder="eg. tomalian@tml.vn" required />
+      </div>
+    </div>
+
+    <div>
+      <label>Password (min 8 chars)</label>
+      <input name="password" type="password" required />
+    </div>
+
+    <button class="btn primary" type="submit">Create account</button>
+  </form>
+</div>

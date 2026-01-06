@@ -1,0 +1,54 @@
+<div class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/">
+      <img class="brand-logo" src="/public/icons/logo-placeholder.png" alt="Tomalia logo" />
+      <img class="brand-text" src="/public/icons/brand_name.png">
+    </a>
+
+    <form class="searchbar" action="/search" method="GET" role="search" aria-label="Site search">
+      <input name="q" placeholder="Search items, hashtags, keywords..." />
+      <button class="icon-btn" type="submit" aria-label="Search">
+        <img src="/public/icons/search-placeholder.png" alt="" />
+      </button>
+    </form>
+
+    <div class="nav-actions">
+      <a class="nav-icon" href="/sell" aria-label="Sell">
+        <img src="/public/icons/sell-placeholder.png" alt="" />
+        <span>Sell</span>
+      </a>
+
+      <a class="nav-icon" href="/cart" aria-label="Cart">
+        <img src="/public/icons/cart-placeholder.png" alt="" />
+        <span>Cart</span>
+      </a>
+
+      <a class="nav-icon" href="/notifications" aria-label="Notifications">
+        <span class="icon-wrap">
+          <img src="/public/icons/bell-placeholder.png" alt="" />
+          <% if (unreadCount > 0) { %>
+            <span class="noti-badge"><%= unreadCount %></span>
+          <% } %>
+        </span>
+        <span>Notifications</span>
+      </a>
+
+      <% if (user) { %>
+        <a class="nav-icon" href="/mypage" aria-label="My Page">
+          <img src="/public/icons/user-placeholder.png" alt="" />
+          <span>My Page</span>
+        </a>
+
+        <form action="/logout" method="POST" class="nav-icon-form">
+          <button class="nav-icon" type="submit" aria-label="Log out">
+            <img src="/public/icons/logout-placeholder.png" alt="" />
+            <span>Log out</span>
+          </button>
+        </form>
+      <% } else { %>
+        <a class="btn primary" href="/login">Log in</a>
+        <a class="btn red" href="/register">Register</a>
+      <% } %>
+    </div>
+  </div>
+</div>

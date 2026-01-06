@@ -1,0 +1,176 @@
+<div class="section">
+  <div class="h1">Transaction process</div>
+  <div class="muted">
+    <% if (isSeller) { %>
+      Your item has been purchased and paid, traveler!
+    <% } else { %>
+      You have bought this item, traveler!
+    <% } %>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Left column: transaction details -->
+  <div class="panel" style="flex:1; min-width:340px">
+    <div class="h2">Transaction details</div>
+
+    <div class="kv">
+      <div class="k">Item</div>
+      <div class="v"><b><%= order.item_name %></b></div>
+
+      <div class="k">Item price</div>
+      <div class="v"><%= currencyVND(order.price_vnd) %></div>
+
+      <% if (isSeller) { %>
+        <div class="k">Service fee (5%)</div>
+        <div class="v"><b>- <%= currencyVND(serviceFee) %></b></div>
+
+        <div class="k">Shipping</div>
+        <div class="v">
+          <% if (shippingIncluded) { %>
+            Shipping fee included (Paid by seller)
+          <% } else { %>
+            Extra shipping fee will be charged on delivery.
+          <% } %>
+        </div>
+
+        <div class="k">Seller profit</div>
+        <div class="v">
+          <b><%= currencyVND(sellerProfit) %></b>
+          <span class="text">(Shipping may be deducted)</span>
+        </div>
+
+        <div class="k">Purchased at</div>
+        <div class="v"><%= order.created_at %></div>
+
+        <div class="k">Order ID</div>
+        <div class="v"><b><%= order.id %></b></div>
+      <% } else { %>
+        <div class="k">Shipping</div>
+        <div class="v">
+          <% if (shippingIncluded) { %>
+            Included (Seller pays)
+          <% } else { %>
+            <%= currencyVND(shippingFlat) %>
+          <% } %>
+        </div>
+
+        <div class="k">Purchased at</div>
+        <div class="v"><%= order.created_at %></div>
+
+        <div class="k">Order ID</div>
+        <div class="v"><%= order.id %></div>
+
+        <div class="k"><b>Total amount</b></div>
+        <div class="v"><b><%= currencyVND(buyerTotal) %></b></div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Right column: step actions -->
+  <div class="panel" style="flex:1; min-width:340px">
+    <% if (!isSeller) { %>
+      <% if (order.status === 'awaiting_payment') { %>
+        <div class="h2">Paying Method</div>
+        <div class="muted" style="margin-top:6px">
+          Choose a payment method to confirm payment.
+        </div>
+
+        <div class="form" style="margin-top:12px">
+          <form method="POST" action="/orders/<%= order.id %>/pay">
+            <input type="hidden" name="payment_method" value="vnpay" />
+            <button class="tx-option is-recommended" type="submit">VNPay / QR Banking</button>
+          </form>
+
+          <form method="POST" action="/orders/<%= order.id %>/pay">
+            <input type="hidden" name="payment_method" value="card" />
+            <button class="tx-option" type="submit">Visa / Debit Card</button>
+          </form>
+
+          <div class="small muted" style="margin-top:6px">
+            Prototype note: this page only simulates payment confirmation.
+          </div>
+        </div>
+      <% } else if (order.status === 'awaiting_shipping_method') { %>
+        <div class="h2">Status</div>
+        <div class="muted" style="margin-top:6px">
+          Payment has been confirmed, traveler! Waiting for seller to choose a shipping method.
+        </div>
+      <% } else if (order.status === 'awaiting_shipment') { %>
+        <div class="h2">Status</div>
+        <div class="muted" style="margin-top:6px">
+          Seller confirmed shipping method: <b><%= order.shipping_method_choice || '—' %></b><br/>
+          Your item is on the way, traveler!
+        </div>
+      <% } else if (order.status === 'shipped') { %>
+        <div class="h2">Confirm received</div>
+        <div class="muted" style="margin-top:6px">
+          Your item was marked shipped by the seller, traveler! When it arrives, confirm received.
+        </div>
+        <form method="POST" action="/orders/<%= order.id %>/receive" style="margin-top:12px">
+          <button class="btn primary" type="submit" style="width:100%">Confirm received</button>
+        </form>
+      <% } else if (order.status === 'completed') { %>
+        <div class="h2">Completed</div>
+        <div class="muted" style="margin-top:6px">
+          Purchase completed.</b><br/>
+          Thank you, traveler, for traveling with <span style="color:#c41e07;">tomalia</span>!
+        </div>
+      <% } %>
+    <% } %>
+
+    <% if (isSeller) { %>
+      <% if (order.status === 'awaiting_payment') { %>
+        <div class="h2">Status</div>
+        <div class="muted" style="margin-top:6px">
+          Waiting for buyer to confirm payment.
+        </div>
+      <% } else if (order.status === 'awaiting_shipping_method') { %>
+        <div class="h2">Shipping Methods</div>
+        <div class="section" style="margin:10px 0 14px">
+          Your item has been purchased, traveler! </b><br/>
+          Please choose a shipping method.</b><br/>
+          <span class="small muted"><span style="color:#c41e07;">tomalia</span> recommends using our shipping service — <span style="color:#c41e07;">tomatogo</span> to keep the goods safe throughout the journey.</span>
+        </div>
+
+        <div class="form">
+          <form method="POST" action="/orders/<%= order.id %>/shipping-method">
+            <input type="hidden" name="shipping_choice" value="tomatogo" />
+            <button class="tx-option is-recommended" type="submit">
+              <img class="ship-text" src="/public/icons/ship_name.png" alt=""></b><br/>
+              (recommended)
+            </button>
+          </form>
+
+          <form method="POST" action="/orders/<%= order.id %>/shipping-method">
+            <input type="hidden" name="shipping_choice" value="other" />
+            <button class="tx-option" type="submit">Using other shipping services</button>
+          </form>
+
+          <form method="POST" action="/orders/<%= order.id %>/shipping-method">
+            <input type="hidden" name="shipping_choice" value="meetup" />
+            <button class="tx-option" type="submit">Pick up / Meet up</button>
+          </form>
+        </div>
+      <% } else if (order.status === 'awaiting_shipment') { %>
+        <div class="h2">Confirm ship status</div>
+        <div class="muted" style="margin-top:6px">
+          When you have shipped the item (or completed meetup), confirm here to notify the other.
+        </div>
+        <form method="POST" action="/orders/<%= order.id %>/ship" style="margin-top:12px">
+          <button class="btn primary" type="submit" style="width:100%">Confirm shipped</button>
+        </form>
+      <% } else if (order.status === 'shipped') { %>
+        <div class="h2">Status</div>
+        <div class="muted" style="margin-top:6px">
+          Item has been taken on board. Waiting for buyer to confirm received.
+        </div>
+      <% } else if (order.status === 'completed') { %>
+        <div class="h2">Completed</div>
+        <div class="muted" style="margin-top:6px">
+          Item has arrived at its destination. Purchase completed.
+        </div>
+      <% } %>
+    <% } %>
+  </div>
+</div>

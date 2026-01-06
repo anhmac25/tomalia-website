@@ -1,0 +1,37 @@
+<div class="section">
+  <div class="h1">Notifications</div>
+  <div class="muted">Updates for your purchases, sales, and recommendations.</div>
+</div>
+
+<div class="panel">
+  <% if (notifs.length === 0) { %>
+    <div class="muted">No notifications.</div>
+  <% } %>
+
+  <% notifs.forEach(n => { %>
+    <div class="panel soft" style="margin-bottom:10px; opacity:<%= n.is_read?0.75:1 %>">
+      <div style="display:flex; gap:10px; align-items:center">
+        <div style="font-weight:900"><%= n.title %></div>
+        <div class="right small muted"><%= n.created_at %></div>
+      </div>
+
+      <div style="margin-top:6px"><%= n.body %></div>
+
+      <% if (n.no_actions) { %>
+        <div class="small muted" style="margin-top:10px">System update • No action required</div>
+      <% } else { %>
+        <div class="row" style="margin-top:10px">
+          <% if (n.link) { %><a class="btn primary" href="<%= n.link %>">Open</a><% } %>
+
+          <% if (!n.is_read) { %>
+            <form method="POST" action="/notifications/<%= n.id %>/read">
+              <button class="btn" type="submit">Mark as read</button>
+            </form>
+          <% } else { %>
+            <span class="pill">Read</span>
+          <% } %>
+        </div>
+      <% } %>
+    </div>
+  <% }) %>
+</div>

@@ -1,0 +1,35 @@
+<div class="section">
+  <div class="h1">Discover, trade and exchange fandom goods in <span style="color:#c41e07;">tomalia</span> town!</div>
+  <div class="muted">Suggestions are personalized based previous items viewed.</div>
+</div>
+
+<div class="section">
+  <div class="h2">Browse by category</div>
+  <div class="row">
+    <% categories.forEach(c => { %>
+      <a class="pill"
+        href="/search?tag=<%= encodeURIComponent(String(c.tag).replace(/^#/, '')) %>">
+        <%= c.label %> <span class="muted">#<%= String(c.tag).replace(/^#/, '') %></span>
+      </a>
+    <% }) %>
+  </div>
+</div>
+
+<div class="section">
+  <div class="h2">Suggested items</div>
+  <div class="grid cards">
+    <% items.forEach(it => { %>
+      <a class="card" href="/items/<%= it.id %>">
+        <% if (it.status === 'sold') { %><div class="badge-sold">SOLD</div><% } %>
+        <img src="<%= it.image %>" alt="" />
+        <div class="pad">
+          <div class="title"><%= it.name %></div>
+          <div class="meta">
+            <div><%= currencyVND(it.price_vnd) %></div>
+            <div class="muted">@<%= it.username %></div>
+          </div>
+        </div>
+      </a>
+    <% }) %>
+  </div>
+</div>

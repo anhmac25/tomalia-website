@@ -1,0 +1,109 @@
+<div class="section">
+  <div class="h1">Upload item for sale</div>
+  <div class="muted">Traveler, the rack is ready, let's put up some items for sale!</div>
+  <% if (error) { %><div class="toast"><%= error %></div><% } %>
+</div>
+
+<div class="panel">
+  <form class="form" action="/sell" method="POST" enctype="multipart/form-data">
+    <div>
+      <label><b>Photos</b></label>
+      <div class="small muted"> <i>You must upload at least 1 photo of your item.</i> </div>
+      <input type="file" name="photos" accept="image/*" multiple required />
+      <div class="small muted"> <i>Tip: The more clearly the photo you took, the more travelers will stop and look!</i> </div>
+    </div>
+
+    <div class="two">
+      <div>
+        <label><b>Product category</b></label>
+        <div class="small muted"> <i>Each keyword must be seperated by a space.</i> </div>
+        <input name="category_hashtag" placeholder="eg. kpop photocard..." value="<%= form.category_hashtag || '' %>" required />
+      </div>
+      <div>
+        <label><b>Brand name</b></label>
+        <input name="brand_name" placeholder="eg. Official/Pop Mart/Banpresto..." value="<%= form.brand_name || '' %>" />
+      </div>
+    </div>
+
+    <div class="two">
+      <div>
+        <label><b>Product condition</b></label>
+        <select name="condition" required>
+          <option value="">Choose...</option>
+          <% [
+            "New, unused",
+            "Like new",
+            "No visible scratches or dirt",
+            "Slightly scratched or dirty",
+            "Scratched or dirty",
+            "In poor condition overall"
+          ].forEach(opt => { %>
+            <option value="<%= opt %>" <%= (form.condition===opt)?'selected':'' %>><%= opt %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div>
+        <label><b>Shipping from (City)</b></label>
+        <select name="shipping_from_city" required>
+          <option value="">Choose...</option>
+          <% ["Ho Chi Minh City","Hanoi","Da Nang","Can Tho","Hai Phong","Hue","Nha Trang","Vung Tau","Binh Duong","Dong Nai"].forEach(c => { %>
+            <option value="<%= c %>" <%= (form.shipping_from_city===c)?'selected':'' %>><%= c %></option>
+          <% }) %>
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <label><b>Product features (optional)</b></label>
+      <input name="features" placeholder="eg. official, limited, sealed, with bill..." value="<%= form.features || '' %>" />
+    </div>
+
+    <div>
+      <label><b>Product name (max 50 chars)</b></label>
+      <input name="product_name" maxlength="50" value="<%= form.product_name || '' %>" required />
+    </div>
+
+    <div>
+      <label><b>Description</b></label>
+      <textarea name="description" required><%= form.description || '' %></textarea>
+    </div>
+
+    <div class="two">
+      <div>
+        <label><b>Shipping fee included in price?</b></label>
+        <select name="shipping_fee_payer" required>
+          <option value="">Choose...</option>
+          <option value="Yes">Yes (Seller pays)</option>
+          <option value="No">No (Charges extra fees for buyer)</option>
+        </select>
+      </div>
+      <div>
+        <label><b>Shipping method</b></label>
+        <select name="shipping_method" required>
+          <option value="">Choose...</option>
+          <% ["Standard delivery","Express delivery","Pick-up / Meet-up"].forEach(opt => { %>
+            <option value="<%= opt %>" <%= (form.shipping_method===opt)?'selected':'' %>><%= opt %></option>
+          <% }) %>
+        </select>
+      </div>
+    </div>
+
+    <div class="two">
+      <div>
+        <label><b>Days to ship</b></label>
+        <select name="days_to_ship" required>
+          <option value="">Choose...</option>
+          <% ["1-2 days","5-7 days","15 days","a month","3 months","6 months","a year",">a year"].forEach(opt => { %>
+            <option value="<%= opt %>" <%= (form.days_to_ship===opt)?'selected':'' %>><%= opt %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div>
+        <label><b>Selling price (VND)</b></label>
+        <input name="price_vnd" type="number" min="1000" step="1000" value="<%= form.price_vnd || '' %>" required />
+      </div>
+    </div>
+
+    <button class="btn primary" type="submit">Publish listing</button>
+  </form>
+</div>

@@ -1,0 +1,25 @@
+<div class="section">
+  <div class="h1">Search</div>
+  <div class="muted">
+    <% if (q) { %>Query: <b><%= q %></b><% } %>
+    <% if (tag) { %> Tag: <b><%= tag %></b><% } %>
+  </div>
+</div>
+
+<div class="section">
+  <div class="grid cards">
+    <% items.forEach(it => { %>
+      <a class="card" href="/items/<%= it.id %>">
+        <% if (it.status === 'sold') { %><div class="badge-sold">SOLD</div><% } %>
+        <img src="<%= it.image %>" alt="" />
+        <div class="pad">
+          <div class="title"><%= it.name %></div>
+          <div class="meta">
+            <div><%= currencyVND(it.price_vnd) %></div>
+            <div class="muted"><%= it.shipping_from_city %></div>
+          </div>
+        </div>
+      </a>
+    <% }) %>
+  </div>
+</div>

@@ -1,0 +1,204 @@
+<div class="section">
+  <div class="row" style="align-items:center">
+    <div class="h1" style="margin:0"><%= item.name %></div>
+    <% if (item.status === 'sold') { %>
+      <span class="sold-pill">SOLD</span>
+    <% } %>
+    <div class="right muted"><%= daysAgo(item.created_at) %></div>
+  </div>
+</div>
+
+<div class="item-hero">
+  <div class="gallery">
+    <div class="mainimg">
+      <img data-main-image
+           src="<%= (images[0] && images[0].file_path) ? images[0].file_path : '/public/item-placeholder.svg' %>"
+           alt="">
+    </div>
+
+    <div class="thumbs">
+      <% images.forEach(img => { %>
+        <img src="<%= img.file_path %>" onclick="switchMainImage('<%= img.file_path %>')" />
+      <% }) %>
+    </div>
+
+    <div class="panel">
+      <div class="h2">Product Description</div>
+      <div style="white-space:pre-wrap"><%= item.description %></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="h2"><%= currencyVND(item.price_vnd) %></div>
+
+    <div class="item-actions">
+      <div class="item-action-bar">
+
+        <% if (item.status !== 'available') { %>
+
+          <!-- SOLD / UNAVAILABLE -->
+          <button class="icon-action" type="button" disabled>
+            <img src="/public/icons/heart-outline.png" class="icon" alt="Like">
+            <span class="count">—</span>
+            <span class="label">Like</span>
+          </button>
+
+          <button class="buy-now-btn" type="button" disabled>
+            Sold
+          </button>
+
+          <button class="icon-action" type="button" disabled>
+            <img src="/public/icons/cart-placeholder.png" class="icon" alt="Cart">
+            <span class="label">Add to cart</span>
+          </button>
+
+        <% } else if (isOwner) { %>
+
+          <!-- OWNER ACTIONS -->
+          <form method="POST"
+                action="/items/<%= encodeURIComponent(String(item.id)) %>?_method=DELETE"
+                onsubmit="return confirm('Discard this item?')">
+            <button class="btn danger" type="submit">Discard item</button>
+          </form>
+
+          <a class="btn primary" href="/items/<%= encodeURIComponent(String(item.id)) %>/edit">
+            Change information
+          </a>
+
+        <% } else { %>
+
+          <!-- LIKE -->
+          <button
+            type="button"
+            class="icon-action like-btn <%= interested ? 'liked' : '' %>"
+            data-interest-btn
+            data-item-id="<%= item.id %>"
+            onclick="toggleInterest(<%- JSON.stringify(item.id) %>)"
+            aria-label="Like item"
+          >
+            <img
+              src="<%= interested ? '/public/icons/heart-filled.png' : '/public/icons/heart-outline.png' %>"
+              class="icon"
+              data-like-icon-img
+              alt="Like"
+            >
+            <span class="count" data-interest-count><%= interestCount %></span>
+            <span class="label">Like</span>
+          </button>
+
+          <!-- BUY NOW -->
+          <form method="POST"
+                action="/items/<%= encodeURIComponent(String(item.id)) %>/buy"
+                onsubmit="return confirm('Confirm Buy Now?')">
+            <button type="submit" class="buy-now-btn">
+              Buy now
+            </button>
+          </form>
+
+          <!-- CART -->
+          <button
+            type="button"
+            class="icon-action cart-btn"
+            data-cart-btn
+            data-item-id="<%= item.id %>"
+            onclick="addToCart(<%- JSON.stringify(item.id) %>)"
+            aria-label="Add to cart"
+          >
+            <img src="/public/icons/cart-placeholder.png" class="icon" alt="Add to cart">
+            <span class="label">Add to cart</span>
+          </button>
+
+        <% } %>
+
+      </div>
+    </div> <!-- ✅ FIX: close .item-actions -->
+
+    <hr class="sep" />
+
+    <div class="h2">Product Information</div>
+    <div class="kv">
+      <div class="k">Categories / Hashtags</div>
+      <div><%= item.category_hashtag %></div>
+
+      <div class="k">Brand</div>
+      <div><%= item.brand_name || '—' %></div>
+
+      <div class="k">Condition</div>
+      <div><%= item.condition %></div>
+
+      <div class="k">Features</div>
+      <div><%= item.features || '—' %></div>
+
+      <div class="k">Shipping included</div>
+      <div><%= item.shipping_fee_payer %></div>
+
+      <div class="k">Shipping method</div>
+      <div><%= item.shipping_method %></div>
+
+      <div class="k">Days to ship</div>
+      <div><%= item.days_to_ship %></div>
+
+      <div class="k">Shipping from</div>
+      <div><%= item.shipping_from_city %></div>
+    </div>
+
+    <div class="h2">Seller Information</div>
+    <div class="seller">
+      <img src="<%= item.seller_avatar || '/public/avatar-placeholder.svg' %>" alt="">
+      <div style="flex:1">
+        <div style="font-weight:800">
+          <%= item.seller_name %> <span class="muted">@<%= item.seller_username %></span>
+        </div>
+
+        <div class="small">
+          <span class="stars"><%= '★★★★★'.slice(0, Math.round(item.seller_rating)) %></span>
+          <span class="muted">(<%= item.seller_rating.toFixed(1) %>/5)</span>
+
+          <span
+            class="verified-icon <%= item.seller_verified ? 'is-verified' : 'not-verified' %>"
+            title="<%= item.seller_verified ? 'This seller is verified.' : 'This seller has not been verified.' %>"
+          >
+            <img
+              src="<%= item.seller_verified ? '/public/icons/verified.png' : '/public/icons/not_verified.png' %>"
+              alt="<%= item.seller_verified ? 'Verified' : 'Not verified' %>"
+            >
+          </span>
+        </div>
+
+        <div style="margin-top:6px">
+          <% const tags = (item.seller_tags || '').split(',').map(s=>s.trim()).filter(Boolean); %>
+          <% if (tags.length) { %>
+            <div class="seller-tags muted small"><%= tags.join(' • ') %></div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <hr class="sep" />
+
+    <div class="h2">Related Keywords</div>
+    <div class="row">
+      <% keywords.forEach(k => { %>
+        <a class="pill" href="/search?q=<%= encodeURIComponent(k) %>">#<%= k %></a>
+      <% }) %>
+    </div>
+  </div>
+</div>
+
+<div class="section suggestions">
+  <div class="h2">You may also like</div>
+  <div class="grid cards suggestions-grid">
+    <% suggestions.forEach(s => { %>
+      <a class="card" href="/items/<%= s.id %>">
+        <img src="<%= s.image %>" alt="" />
+        <div class="pad">
+          <div class="title"><%= s.name %></div>
+          <div class="meta">
+            <div><%= currencyVND(s.price_vnd) %></div>
+            <div class="muted">@<%= s.username %></div>
+          </div>
+        </div>
+      </a>
+    <% }) %>
+  </div>
+</div>

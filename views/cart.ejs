@@ -1,0 +1,28 @@
+<div class="section">
+  <div class="h1">Cart</div>
+  <div class="muted">Traverler, here are the items ready to check out!</div>
+</div>
+
+<div class="section">
+  <% if (items.length === 0) { %>
+    <div class="panel"><div class="muted">Your cart is empty.</div></div>
+  <% } else { %>
+    <div class="grid cards">
+      <% items.forEach(it => { %>
+        <div class="card">
+          <% if (it.status === 'sold') { %><div class="badge-sold">SOLD</div><% } %>
+          <a href="/items/<%= it.id %>"><img src="<%= it.image %>" alt=""></a>
+          <div class="pad">
+            <div class="title"><%= it.name %></div>
+            <div class="meta"><div><%= currencyVND(it.price_vnd) %></div><div class="muted">@<%= it.username %></div></div>
+            <div style="margin-top:10px">
+              <form action="/cart/<%= it.id %>?_method=DELETE" method="POST">
+                <button class="btn danger" type="submit">Remove</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>

@@ -1,0 +1,98 @@
+<div class="section">
+  <div class="h1">Edit listing</div>
+  <div class="muted">You can update details while the item is still available.</div>
+  <% if (error) { %><div class="toast"><%= error %></div><% } %>
+</div>
+
+<div class="panel">
+  <form class="form" action="/items/<%= item.id %>?_method=PUT" method="POST">
+    <div class="two">
+      <div>
+        <label><b>Product category</b></label>
+        <input name="category_hashtag" value="<%= item.category_hashtag %>" required />
+      </div>
+      <div>
+        <label><b>Brand name</b></label>
+        <input name="brand_name" value="<%= item.brand_name %>" />
+      </div>
+    </div>
+
+    <div class="two">
+      <div>
+        <label><b>Product condition</b></label>
+        <select name="condition" required>
+          <% [
+            "New, unused",
+            "Like new",
+            "No visible scratches or dirt",
+            "Slightly scratched or dirty",
+            "Scratched or dirty",
+            "In poor condition overall"
+          ].forEach(opt => { %>
+            <option value="<%= opt %>" <%= (item.condition===opt)?'selected':'' %>><%= opt %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div>
+        <label><b>Shipping from (City)</b></label>
+        <select name="shipping_from_city" required>
+          <% ["Ho Chi Minh City","Hanoi","Da Nang","Can Tho","Hai Phong","Hue","Nha Trang","Vung Tau","Binh Duong","Dong Nai"].forEach(c => { %>
+            <option value="<%= c %>" <%= (item.shipping_from_city===c)?'selected':'' %>><%= c %></option>
+          <% }) %>
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <label><b>Product features (optional)</b></label>
+      <input name="features" value="<%= item.features %>" />
+    </div>
+
+    <div>
+      <label><b>Product name (max 50 chars)</b></label>
+      <input name="product_name" maxlength="50" value="<%= item.name %>" required />
+    </div>
+
+    <div>
+      <label><b>Description</b></label>
+      <textarea name="description" required><%= item.description %></textarea>
+    </div>
+
+    <div class="two">
+      <div>
+        <label><b>Shipping fee included in price?</b></label>
+        <select name="shipping_fee_payer" required>
+          <option value="">Choose...</option>
+          <option value="Yes">Yes (Seller pays)</option>
+          <option value="No">No (Charges extra fees for buyer)</option>
+        </select>
+      </div>
+      <div>
+        <label><b>Shipping method</b></label>
+        <select name="shipping_method" required>
+          <% ["Standard delivery","Express delivery","Pick-up / Meet-up"].forEach(opt => { %>
+            <option value="<%= opt %>" <%= (item.shipping_method===opt)?'selected':'' %>><%= opt %></option>
+          <% }) %>
+        </select>
+      </div>
+    </div>
+
+    <div class="two">
+      <div>
+        <label><b>Days to ship</b></label>
+        <select name="days_to_ship" required>
+          <% ["1-2 days","5-7 days","15 days","a month","3 months","6 months","a year",">a year"].forEach(opt => { %>
+            <option value="<%= opt %>" <%= (item.days_to_ship===opt)?'selected':'' %>><%= opt %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div>
+        <label><b>Selling price (VND)</b></label>
+        <input name="price_vnd" type="number" min="1000" step="1000" value="<%= item.price_vnd %>" required />
+      </div>
+    </div>
+
+    <button class="btn primary" type="submit">Save changes</button>
+    <a class="btn" href="/items/<%= item.id %>">Cancel</a>
+  </form>
+</div>

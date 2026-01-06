@@ -1,0 +1,232 @@
+<div class="section">
+  <div class="h1">My Page</div>
+  <div class="muted">Manage your profile, your small home at <span style="color:#c41e07;">tomalia</span>, traveler!</div>
+</div>
+
+<div class="tabs section">
+  <a class="tab <%= tab==='profile'?'active':'' %>" href="/mypage?tab=profile">Profile</a>
+  <a class="tab <%= tab==='selling'?'active':'' %>" href="/mypage?tab=selling">Selling</a>
+  <a class="tab <%= tab==='sold'?'active':'' %>" href="/mypage?tab=sold">Sold</a>
+  <a class="tab <%= tab==='purchases'?'active':'' %>" href="/mypage?tab=purchases">Purchase history</a>
+  <a class="tab <%= tab==='interested'?'active':'' %>" href="/mypage?tab=interested">Interested</a>
+  <a class="tab <%= tab==='verify'?'active':'' %>" href="/mypage?tab=verify">Verification</a>
+</div>
+
+<% if (tab === 'profile') { %>
+  <div class="panel">
+    <div class="h2">Personal information</div>
+    <div class="small muted" style="margin-bottom:10px">
+      Username, email and phone were set at registration and can’t be changed.
+    </div>
+
+    <form class="form" method="POST" action="/mypage/profile" enctype="multipart/form-data">
+      <div class="two">
+        <div>
+          <label><b>Username</b></label>
+          <input value="@<%= user.username %>" disabled />
+        </div>
+        <div>
+          <label><b>Email</b></label>
+          <input value="<%= user.email %>" disabled />
+        </div>
+      </div>
+
+      <div class="two">
+        <div>
+          <label><b>Phone</b></label>
+          <input value="<%= user.phone %>" disabled />
+        </div>
+        <div>
+          <label><b>Gender</b></label>
+          <select name="gender">
+            <option value="" <%= !user.gender ? "selected" : "" %> >—</option>
+            <option value="male" <%= user.gender === "male" ? "selected" : "" %> >Male</option>
+            <option value="female" <%= user.gender === "female" ? "selected" : "" %> >Female</option>
+            <option value="other" <%= user.gender === "other" ? "selected" : "" %> >Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="two">
+        <div>
+          <label><b>Name</b></label>
+          <input name="name" value="<%= user.name %>" />
+        </div>
+        <div>
+          <label><b>Birthday</b></label>
+          <input type="date" name="birthday" value="<%= (user.birthday || '') %>" />
+        </div>
+      </div>
+
+      <div class="two">
+        <div>
+          <label><b>Seller tags (comma-separated)</b></label>
+          <input name="tags" value="<%= user.tags %>" />
+        </div>
+        <div>
+          <label><b>Favorite fandoms (comma-separated)</b></label>
+          <input name="favorite_fandoms" value="<%= user.favorite_fandoms || '' %>" placeholder="e.g., genshin, vtuber, kpop" />
+        </div>
+      </div>
+
+      <div class="three">
+        <div>
+          <label><b>City</b></label>
+          <input name="address_city" value="<%= user.address_city || '' %>" />
+        </div>
+        <div>
+          <label><b>District</b></label>
+          <input name="address_district" value="<%= user.address_district || '' %>" />
+        </div>
+        <div>
+          <label><b>Address detail</b></label>
+          <input name="address_detail" value="<%= user.address_detail || '' %>" placeholder="Street, ward, building..." />
+        </div>
+      </div>
+
+      <div>
+        <label><b>Bio</b></label>
+        <textarea name="bio" placeholder="A short intro for you, traveler!"><%= user.bio || '' %></textarea>
+      </div>
+
+      <div class="avatar-row">
+        <div>
+          <div><label><b>Profile picture</b></label></div>
+          <img
+            id="avatarPreview"
+            class="avatar-preview"
+            src="<%= user.avatar_url || '/public/avatar-placeholder.png' %>"
+            alt="Profile picture preview"
+          />
+        </div>
+        <div style="flex:1">
+          <label><b>Upload new profile picture</b></label>
+          <input id="avatarInput" type="file" name="avatar" accept="image/*" />
+        </div>
+      </div>
+
+      <button class="btn primary" type="submit">Save</button>
+    </form>
+
+    <script>
+      (function () {
+        const input = document.getElementById("avatarInput");
+        const img = document.getElementById("avatarPreview");
+        if (!input || !img) return;
+
+        input.addEventListener("change", function () {
+          const file = input.files && input.files[0];
+          if (!file) return;
+          const url = URL.createObjectURL(file);
+          img.src = url;
+          img.onload = () => URL.revokeObjectURL(url);
+        });
+      })();
+    </script>
+  </div>
+<% } %>
+
+<% if (tab === 'selling') { %>
+  <div class="section">
+    <div class="h2">Items listing</div>
+    <div class="grid cards">
+      <% sellingAvail.forEach(it => { %>
+        <a class="card" href="/items/<%= it.id %>">
+          <img src="<%= it.image %>" alt="">
+          <div class="pad">
+            <div class="title"><%= it.name %></div>
+            <div class="meta"><div><%= currencyVND(it.price_vnd) %></div><div class="muted"><%= daysAgo(it.created_at) %></div></div>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+    <% if (sellingAvail.length === 0) { %><div class="muted">No active listings.</div><% } %>
+  </div>
+<% } %>
+
+<% if (tab === 'sold') { %>
+  <div class="section">
+    <div class="h2">Sold items</div>
+    <div class="grid cards">
+      <% soldItems.forEach(it => { %>
+        <div class="card">
+          <div class="badge-sold">SOLD</div>
+          <a href="/items/<%= it.id %>">
+            <img src="<%= it.image %>" alt="">
+          </a>
+          <div class="pad">
+            <div class="title"><%= it.name %></div>
+            <div class="meta"><div><%= currencyVND(it.price_vnd) %></div><div class="muted"><%= daysAgo(it.created_at) %></div></div>
+            <div class="card-actions">
+              <% if (it.order_id) { %>
+                <a class="btn btn-card" href="/orders/<%= it.order_id %>/transaction">Inspect item status</a>
+              <% } else { %>
+                <button class="btn btn-card" disabled>Inspect item status</button>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+    <% if (soldItems.length === 0) { %><div class="muted">No sold items yet.</div><% } %>
+  </div>
+<% } %>
+
+<% if (tab === 'purchases') { %>
+  <div class="section">
+    <div class="h2">Purchase history</div>
+    <% if (purchases.length === 0) { %>
+      <div class="muted">No purchases yet.</div>
+    <% } else { %>
+      <% purchases.forEach(o => { %>
+        <div class="panel soft" style="margin-bottom:10px">
+          <div style="display:flex; gap:10px; align-items:center">
+            <div style="font-weight:800"><a href="/items/<%= o.item_id %>"><%= o.item_name %></a></div>
+            <div class="right pill">Status: <% const statusLabel = {awaiting_payment: "Awaiting payment", awaiting_shipping_method: "Awaiting shipping method", awaiting_shipment: "Awaiting shipment", shipped: "Shipped", completed: "Completed"} [o.status] || o.status; %> <%= statusLabel %></div>
+          </div>
+          <div class="muted small">Order #<%= o.id %> • Price: <%= currencyVND(o.price_vnd) %></div>
+          <div class="row" style="margin-top:10px">
+            <a class="btn primary" href="/orders/<%= o.id %>/transaction">Open transaction</a>
+          </div>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+<% } %>
+
+<% if (tab === 'interested') { %>
+  <div class="section">
+    <div class="h2">Interested items</div>
+    <div class="grid cards">
+      <% interested.forEach(it => { %>
+        <a class="card" href="/items/<%= it.id %>">
+          <% if (it.status === 'sold') { %><div class="badge-sold">SOLD</div><% } %>
+          <img src="<%= it.image %>" alt="">
+          <div class="pad">
+            <div class="title"><%= it.name %></div>
+            <div class="meta"><div><%= currencyVND(it.price_vnd) %></div><div class="muted"><%= it.shipping_from_city %></div></div>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+    <% if (interested.length === 0) { %><div class="muted">No interested items yet.</div><% } %>
+  </div>
+<% } %>
+
+<% if (tab === 'verify') { %>
+  <div class="section">
+    <div class="h2">Identity verification</div>
+    <% if (user.verified) { %>
+      <div class="toast success">Verified ✅ Your account has higher trust level.</div>
+    <% } else { %>
+      <div class="toast">Not verified. Upload a document to gain higher legit (prototype).</div>
+      <form class="form" method="POST" action="/mypage/verify" enctype="multipart/form-data">
+        <div>
+          <label>Upload ID document (prototype)</label>
+          <input type="file" name="id_doc" accept="image/*" required />
+        </div>
+        <button class="btn primary" type="submit">Verify</button>
+      </form>
+    <% } %>
+  </div>
+<% } %>
